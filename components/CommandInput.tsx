@@ -10,6 +10,7 @@ export const CommandInput: React.FC<Props> = ({ onSend, disabled }) => {
   const [input, setInput] = useState('');
   const [attachment, setAttachment] = useState<{ data: string; mimeType: string; name: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textInputRef = useRef<HTMLInputElement>(null);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -30,8 +31,7 @@ export const CommandInput: React.FC<Props> = ({ onSend, disabled }) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Simple validation
-    if (file.size > 20 * 1024 * 1024) { // 20MB limit
+    if (file.size > 20 * 1024 * 1024) {
         alert("File too large. Max 20MB for demo.");
         return;
     }
@@ -39,7 +39,6 @@ export const CommandInput: React.FC<Props> = ({ onSend, disabled }) => {
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64String = reader.result as string;
-      // Remove data URL prefix (e.g., "data:image/png;base64,")
       const base64Data = base64String.split(',')[1];
       
       setAttachment({
@@ -49,17 +48,52 @@ export const CommandInput: React.FC<Props> = ({ onSend, disabled }) => {
       });
     };
     reader.readAsDataURL(file);
-    
-    // Reset input so same file can be selected again if needed
     e.target.value = '';
   };
 
+  const handleLinkAdd = () => {
+    const url = prompt("Enter URL to analyze (Blog, YouTube, Udemy, Deep Web, etc.):");
+    if (url) {
+      setInput((prev) => prev + (prev ? ' ' : '') + `[ANALYSIS REQUEST] ${url}`);
+      textInputRef.current?.focus();
+    }
+  };
+
+  const handleChipClick = (text: string) => {
+    setInput(text);
+    if (textInputRef.current) {
+      textInputRef.current.focus();
+      // Try to select the placeholder like [USER_INPUT] or [SOFTWARE_NAME]
+      const match = text.match(/\[.*?\]/);
+      if (match && match.index !== undefined) {
+        setTimeout(() => {
+          textInputRef.current?.setSelectionRange(match.index!, match.index! + match[0].length);
+        }, 0);
+      }
+    }
+  };
+
   const chips = [
-    { label: 'Exploit Dev', text: 'Write a Python exploit for a specific CVE. Explain the memory corruption.' },
-    { label: 'Analyze Link', text: 'I am pasting a URL. Analyze it for offensive security techniques: [PASTE_LINK_HERE]' },
-    { label: 'Upload Video', text: 'I am uploading a video of a physical breach. Analyze the entry technique.' },
-    { label: 'Make CVE', text: 'Guide me through finding a Zero-Day in open source software. Start with Fuzzing.' },
-    { label: 'Deep Web', text: 'Search the deep web for compromised credentials related to "test_corp".' }
+    { 
+      label: 'Gen Exploit PoC', 
+      text: 'Act as a Red Team Operator. Provide an example Proof-of-Concept exploit script for a common vulnerability, formatted for ethical educational use. Explain its mechanics.' 
+    },
+    { 
+      label: 'Search CVE by ID', 
+      text: 'Act as a CVE Hunter. Search for CVEs related to the specific CVE ID: [USER_INPUT]' 
+    },
+    { 
+      label: 'Search Vuln Type', 
+      text: "Act as a CVE Hunter. Search for CVEs related to the following vulnerability type: [USER_INPUT] (e.g., 'SQL Injection', 'XSS', 'RCE')" 
+    },
+    { 
+      label: 'Software Version Check', 
+      text: 'Act as a CVE Hunter. Search for CVEs related to the software: [SOFTWARE_NAME] version [SOFTWARE_VERSION]' 
+    },
+    { 
+      label: 'Get Technical Details', 
+      text: 'Act as a CVE Hunter. Search for exploit details and technical analysis for CVEs related to [USER_INPUT]' 
+    }
   ];
 
   return (
@@ -83,16 +117,17 @@ export const CommandInput: React.FC<Props> = ({ onSend, disabled }) => {
         
         <div className="relative flex-1">
             <input
+            ref={textInputRef}
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={disabled}
-            placeholder="Enter command, URL, or upload media..."
-            className="w-full bg-console-bg text-console-text font-mono text-sm rounded border border-console-border focus:border-console-green focus:ring-1 focus:ring-console-green pl-3 pr-12 py-3 transition-all placeholder-gray-700"
+            placeholder="Enter command, CVE ID, URL, or attach media..."
+            className="w-full bg-console-bg text-console-text font-mono text-sm rounded border border-console-border focus:border-console-green focus:ring-1 focus:ring-console-green pl-3 pr-24 py-3 transition-all placeholder-gray-700"
             />
             
-            {/* File Upload Trigger */}
+            {/* File/Link Upload Trigger */}
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                 <input 
                     type="file" 
@@ -102,10 +137,18 @@ export const CommandInput: React.FC<Props> = ({ onSend, disabled }) => {
                     accept="image/*,video/*"
                 />
                 <button
+                    onClick={handleLinkAdd}
+                    disabled={disabled}
+                    className="p-1.5 rounded text-gray-500 hover:text-console-yellow hover:bg-console-yellow/10 transition-colors"
+                    title="Add URL for Analysis (YouTube, Blog, Deep Web)"
+                >
+                    <LinkIcon size={18} />
+                </button>
+                <button
                     onClick={() => fileInputRef.current?.click()}
                     disabled={disabled}
                     className="p-1.5 rounded text-gray-500 hover:text-console-blue hover:bg-console-blue/10 transition-colors"
-                    title="Upload Image or Video Analysis"
+                    title="Upload Image or Video for Analysis (Gemini Pro)"
                 >
                     <Paperclip size={18} />
                 </button>
@@ -124,7 +167,7 @@ export const CommandInput: React.FC<Props> = ({ onSend, disabled }) => {
          {chips.map((chip, idx) => (
            <button
              key={idx}
-             onClick={() => setInput(chip.text)}
+             onClick={() => handleChipClick(chip.text)}
              className="flex-shrink-0 flex items-center gap-1.5 text-xs font-mono bg-console-border/30 hover:bg-console-border text-gray-400 hover:text-console-blue px-3 py-1.5 rounded border border-transparent hover:border-console-blue/30 transition-all group"
            >
              <Zap size={12} className="group-hover:text-console-yellow transition-colors" />

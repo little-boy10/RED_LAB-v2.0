@@ -29,9 +29,18 @@ export default function App() {
     };
     setMessages((prev) => [...prev, userMsg]);
 
+    // Intelligent Mode Switching based on Prompt Intent
+    let activeMode = mode;
+    
+    // If the user uses a CVE Hunter prompt, force the mode to ensure Google Search is enabled
+    if (text.includes("Act as a CVE Hunter")) {
+      activeMode = AppMode.CVE_HUNTER;
+      setMode(AppMode.CVE_HUNTER);
+    }
+
     try {
       // Call Gemini Service with optional attachment
-      const response = await generateResponse(text, mode, attachment, setIsThinking);
+      const response = await generateResponse(text, activeMode, attachment, setIsThinking);
 
       // Add Bot Message
       const botMsg: Message = {
