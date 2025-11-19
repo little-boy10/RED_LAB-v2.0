@@ -1,0 +1,5 @@
+{
+  "name": "RedLab: Cyber Range Assistant",
+  "description": "An advanced Red Team mentorship interface using Gemini 2.5 and 3 Pro. Features deep technical analysis, live CVE searching, and voice-guided operations in a simulated terminal environment.",
+  "requestFramePermissions": []
+}
