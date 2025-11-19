@@ -1,6 +1,6 @@
 import React from 'react';
 import { AppMode } from '../types';
-import { Terminal, ShieldAlert, BrainCircuit, Volume2, VolumeX } from 'lucide-react';
+import { Terminal, ShieldAlert, BrainCircuit, Volume2, VolumeX, Zap } from 'lucide-react';
 
 interface Props {
   mode: AppMode;
@@ -18,13 +18,13 @@ export const TerminalHeader: React.FC<Props> = ({ mode, setMode, ttsEnabled, set
         </div>
         <div>
           <h1 className="text-lg font-mono font-bold text-console-text tracking-tight">
-            RED_LAB <span className="text-console-green">v2.0</span>
+            RED_LAB <span className="text-console-green">v2.5</span>
           </h1>
           <p className="text-xs text-gray-500 font-mono uppercase">Offensive Security Workbench</p>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 bg-console-bg p-1 rounded-lg border border-console-border">
+      <div className="flex flex-wrap justify-center gap-2 bg-console-bg p-1 rounded-lg border border-console-border">
         <button
           onClick={() => setMode(AppMode.MENTOR)}
           className={`px-3 py-1.5 rounded text-xs font-mono font-bold transition-all flex items-center gap-2 ${
@@ -32,9 +32,23 @@ export const TerminalHeader: React.FC<Props> = ({ mode, setMode, ttsEnabled, set
               ? 'bg-console-border text-console-text shadow-sm' 
               : 'text-gray-500 hover:text-gray-300'
           }`}
+          title="Standard Mentor Mode (Flash)"
         >
           <Terminal size={14} />
           SHELL
+        </button>
+
+        <button
+          onClick={() => setMode(AppMode.SPEED_OPS)}
+          className={`px-3 py-1.5 rounded text-xs font-mono font-bold transition-all flex items-center gap-2 ${
+            mode === AppMode.SPEED_OPS 
+              ? 'bg-console-blue/20 text-console-blue border border-console-blue/30' 
+              : 'text-gray-500 hover:text-gray-300'
+          }`}
+          title="Low Latency Mode (Flash-Lite)"
+        >
+          <Zap size={14} />
+          LITE
         </button>
         
         <button
@@ -44,9 +58,10 @@ export const TerminalHeader: React.FC<Props> = ({ mode, setMode, ttsEnabled, set
               ? 'bg-console-purple/20 text-console-purple border border-console-purple/30' 
               : 'text-gray-500 hover:text-gray-300'
           }`}
+          title="Thinking Mode (Pro)"
         >
           <BrainCircuit size={14} />
-          DEEP_THINK
+          THINK
         </button>
 
         <button
@@ -56,9 +71,10 @@ export const TerminalHeader: React.FC<Props> = ({ mode, setMode, ttsEnabled, set
               ? 'bg-console-yellow/20 text-console-yellow border border-console-yellow/30' 
               : 'text-gray-500 hover:text-gray-300'
           }`}
+          title="Search Grounding"
         >
           <ShieldAlert size={14} />
-          CVE_HUNT
+          HUNT
         </button>
       </div>
 

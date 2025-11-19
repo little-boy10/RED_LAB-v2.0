@@ -15,9 +15,10 @@ export interface Message {
 }
 
 export enum AppMode {
-  MENTOR = 'mentor', // Standard Red Team Mentor
-  DEEP_ANALYSIS = 'deep_analysis', // Thinking Model
-  CVE_HUNTER = 'cve_hunter', // Search Grounding
+  MENTOR = 'mentor', // Standard Red Team Mentor (Flash)
+  DEEP_ANALYSIS = 'deep_analysis', // Thinking Model (Pro)
+  CVE_HUNTER = 'cve_hunter', // Search Grounding (Flash)
+  SPEED_OPS = 'speed_ops', // Low Latency (Flash-Lite)
 }
 
 export interface ChatConfig {

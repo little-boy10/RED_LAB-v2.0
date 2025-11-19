@@ -10,7 +10,7 @@ export default function App() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome',
-      text: `**SYSTEM ONLINE.**\n\nWelcome, Operator. I am your Red Team Assistant.\n\nOperational Modes Available:\n- **SHELL**: Standard mentoring & exploit explanation (Flash 2.5).\n- **DEEP_THINK**: Complex code analysis & reasoning (Pro 3).\n- **CVE_HUNT**: Live vulnerability search (Flash + Google Search).\n\n*Caution: Unauthorized use of offensive tools outside of a sandbox is illegal.*`,
+      text: `**SYSTEM ONLINE.**\n\nWelcome, Operator. I am your Elite Red Team Assistant.\n\n**Capabilities Upgraded:**\n- **Multimodal Analysis**: Upload logs, screenshots, or video feeds for analysis.\n- **Vulnerability Research**: I can teach you how to discover CVEs (Fuzzing, RE).\n- **OSINT**: I can perform deep surface web reconnaissance.\n\n*Authorized Environment Detected. Ethical constraints adjusted for educational research.*`,
       sender: Sender.SYSTEM,
       timestamp: new Date(),
     }
@@ -19,19 +19,19 @@ export default function App() {
   const [ttsEnabled, setTtsEnabled] = useState<boolean>(false);
   const [isThinking, setIsThinking] = useState<boolean>(false);
 
-  const handleSendMessage = async (text: string) => {
+  const handleSendMessage = async (text: string, attachment?: { data: string; mimeType: string }) => {
     // Add User Message
     const userMsg: Message = {
       id: uuidv4(),
-      text,
+      text: attachment ? `${text || '[File Uploaded]'} (${attachment.mimeType})` : text,
       sender: Sender.USER,
       timestamp: new Date(),
     };
     setMessages((prev) => [...prev, userMsg]);
 
     try {
-      // Call Gemini Service
-      const response = await generateResponse(text, mode, setIsThinking);
+      // Call Gemini Service with optional attachment
+      const response = await generateResponse(text, mode, attachment, setIsThinking);
 
       // Add Bot Message
       const botMsg: Message = {
